@@ -2,7 +2,7 @@ package html
 
 type Status int
 
-// <div>
+// <div class="foo" id="1">
 //   <h1>
 //     hello word
 //   </h1>
@@ -15,7 +15,10 @@ const (
 	TagClose
 	Text
 	TagEndName
-	Attribute
+
+	AttrOpen
+	Attr
+	AttrEnd
 )
 
 func isLetter(s rune) bool {
@@ -26,6 +29,7 @@ type Token struct {
 	Type    string // tag | text | tagEnd
 	Name    string
 	Content string
+	Attrs   []string
 }
 
 func Parser(str string) []Token {
@@ -54,12 +58,52 @@ func Parser(str string) []Token {
 				status = TagName
 				char = append(char, s)
 			}
-			if s == '>' {
+			if s == ' ' || s == '>' {
 				result = append(result, Token{
 					Type: "tag",
 					Name: string(char),
 				})
 				char = []rune{}
+				if s == ' ' {
+
+					status = AttrOpen
+				}
+				if s == '>' {
+					status = TagClose
+				}
+
+			}
+		case AttrOpen:
+			if isLetter(s) {
+				status = Attr
+				char = append(char, s)
+			}
+			if s == '>' {
+				status = TagClose
+			}
+		case Attr:
+			if s == ' ' || s == '>' {
+				currentToken := &result[len(result)-1]
+				currentToken.Attrs = append(currentToken.Attrs, string(char))
+				char = []rune{}
+				if s == ' ' {
+					status = AttrEnd
+				}
+				if s == '>' {
+					status = TagClose
+				}
+
+			} else {
+				char = append(char, s)
+
+				status = Attr
+			}
+		case AttrEnd:
+			if isLetter(s) {
+				status = Attr
+				char = append(char, s)
+			}
+			if s == '>' {
 				status = TagClose
 			}
 		case TagClose:
