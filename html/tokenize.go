@@ -27,12 +27,12 @@ func isLetter(s rune) bool {
 
 type Token struct {
 	Type    string // tag | text | tagEnd
-	Name    string
+	Tag     string
 	Content string
 	Attrs   []string
 }
 
-func Parser(str string) []Token {
+func Tokenize(str string) []Token {
 	status := Initial
 	result := []Token{}
 	char := []rune{}
@@ -61,7 +61,7 @@ func Parser(str string) []Token {
 			if s == ' ' || s == '>' {
 				result = append(result, Token{
 					Type: "tag",
-					Name: string(char),
+					Tag:  string(char),
 				})
 				char = []rune{}
 				if s == ' ' {
@@ -133,7 +133,7 @@ func Parser(str string) []Token {
 			if s == '>' {
 				result = append(result, Token{
 					Type: "tagEnd",
-					Name: string(char),
+					Tag:  string(char),
 				})
 				char = []rune{}
 				status = TagClose

@@ -6,20 +6,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParser(t *testing.T) {
+func TestTokenize(t *testing.T) {
 	tagDiv := Token{
 		Type: "tag",
-		Name: "div",
+		Tag:  "div",
 	}
 	tagEndDiv := Token{
 		Type: "tagEnd",
-		Name: "div",
+		Tag:  "div",
 	}
 	text := Token{
 		Type:    "text",
 		Content: "1",
 	}
-	token1 := Parser("<div>1</div>")
+	token1 := Tokenize("<div>1</div>")
 	token1Valid := []Token{
 		tagDiv,
 		text,
@@ -28,7 +28,7 @@ func TestParser(t *testing.T) {
 
 	assert.Equal(t, token1, token1Valid, "they should be equal")
 
-	token2 := Parser("<div>1<div>1</div></div>")
+	token2 := Tokenize("<div>1<div>1</div></div>")
 	token2Valid := []Token{
 		tagDiv,
 		text,
@@ -40,7 +40,7 @@ func TestParser(t *testing.T) {
 
 	assert.Equal(t, token2, token2Valid, "they should be equal")
 
-	token3 := Parser(`<div id="ss">1</div>`)
+	token3 := Tokenize(`<div id="ss">1</div>`)
 	tagDiv.Attrs = []string{`id="ss"`}
 	token3Valid := []Token{
 		tagDiv,
